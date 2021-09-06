@@ -1,0 +1,63 @@
+
+docker run -d -p 80:80 docker/getting-started
+
+You’ll notice a few flags being used. Here’s some more info on them:
+
+-d - run the container in detached mode (in the background)
+-p 80:80 - map port 80 of the host to port 80 in the container
+docker/getting-started - the image to use
+
+
+docker version
+docker run
+docker image
+docker container
+
+docker build -t getting-started .
+
+Finally, the -t flag tags our image. Think of this simply as a human-readable name for the final image. Since we named the image getting-started, we can refer to that image when we run a container.
+
+The . at the end of the docker build command tells that Docker should look for the Dockerfile in the current directory.
+
+start the container -  docker run -dp 3000:3000 getting-started
+Start your container using the docker run command and specify the name of the image we just created:
+
+Use 'docker scan' to run Snyk tests against images to find vulnerabilities and learn how to 
+fix them
+
+************************************************SET UP--------------
+**Jfrog --
+1. Pull artifactory image inside docker - 
+docker pull docker.bintray.io/jfrog/artifactory-oss:latest
+2. Run the artifactory -
+docker run --name artifactory -d -p 8081:8081 docker.bintray.io/jfrog/artifactory-oss:latest
+3.To control the memory used by Artifactory, you can pass the environment variable EXTRA_JAVA_OPTIONS.
+
+For example:
+
+Passing JVM memory to Artifactory Docker container
+docker run --name artifactory -d -p 8081:8081 -e EXTRA_JAVA_OPTIONS='-Xms512m -Xmx2g -Xss256k -XX:+UseG1GC' docker.bintray.io/jfrog/artifactory-pro:latest
+
+***Jenkins -
+docker pull jenkins/jenkins
+docker run -p 8080:8080 --name=jenkins-master -d jenkins/jenkins
+
+*Memory setting - 
+
+We tend to run Jenkins with some beefy settings at Riot. Remember when you increased the CPU/Memory Docker uses earlier? This is the primary reason why. For a basic start, run the following commands
+
+docker stop jenkins-master
+docker rm jenkins-master
+docker run -p 8080:8080 --name=jenkins-master -d --env JAVA_OPTS="-Xmx8192m" jenkins/jenkins
+
+*INCREASING THE CONNECTION POOL
+
+At Riot, we get a lot of traffic to our Jenkins server, so we’ve learned to give Jenkins a bit more breathing room. Run the following
+
+docker stop jenkins-master
+docker rm jenkins-master
+docker run -p 8080:8080 --name=jenkins-master -d --env JAVA_OPTS="-Xmx8192m" --env JENKINS_OPTS=" --handlerCountMax=300" jenkins/jenkins
+
+*Splunk -
+docker pull splunk/splunk:latest
+docker run -d -p 8000:8000 -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=admin" --name splunk splunk/splunk:latest
